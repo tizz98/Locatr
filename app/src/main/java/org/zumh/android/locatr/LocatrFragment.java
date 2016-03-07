@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -28,6 +29,7 @@ public class LocatrFragment extends Fragment {
     private static final String TAG = "LocatrFragment";
 
     private ImageView mImageView;
+    private ProgressBar mProgressBar;
     private GoogleApiClient mClient;
 
     public static LocatrFragment newInstance() {
@@ -61,6 +63,7 @@ public class LocatrFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_locatr, container, false);
 
         mImageView = (ImageView) v.findViewById(R.id.image);
+        mProgressBar = (ProgressBar) v.findViewById(R.id.progress_bar);
 
         return v;
     }
@@ -120,11 +123,18 @@ public class LocatrFragment extends Fragment {
         private Bitmap mBitmap;
 
         @Override
+        protected void onPreExecute() {
+            mImageView.setImageBitmap(null);
+            mProgressBar.setVisibility(View.VISIBLE);
+        }
+
+        @Override
         protected Void doInBackground(Location... params) {
             FlickrFetchr fetchr = new FlickrFetchr();
             List<GalleryItem> items = fetchr.searchPhotos(params[0]);
 
             if (items.size() == 0) {
+                Log.i(TAG, "No images found");
                 return null;
             }
 
@@ -143,6 +153,7 @@ public class LocatrFragment extends Fragment {
         @Override
         protected void onPostExecute(Void aVoid) {
             mImageView.setImageBitmap(mBitmap);
+            mProgressBar.setVisibility(View.INVISIBLE);
         }
     }
 }
